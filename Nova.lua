@@ -179,117 +179,6 @@ end
 -------------------------------------------------
 
 function Nova:CreateWindow(cfg)
-    --// STATE
-local isFullscreen = false
-local isMinimized = false
-
-local normalSize = main.Size
-local normalPos = main.Position
-
---// SHOW BUTTON (appears when minimized)
-local showBtn = create("TextButton", {
-    Size = UDim2.new(0, 120, 0, 40),
-    Position = UDim2.new(0.5, -60, 0.5, -20),
-    BackgroundColor3 = Color3.fromRGB(10,10,10),
-    Text = "Show",
-    TextColor3 = Color3.fromRGB(255,255,255),
-    Font = Enum.Font.GothamBold,
-    Visible = false,
-    Parent = gui,
-    BorderSizePixel = 0
-})
-
-corner(showBtn, 10)
-stroke(showBtn)
-
---// FULLSCREEN BUTTON
-local fsBtn = create("TextButton", {
-    Size = UDim2.new(0, 26, 0, 26),
-    Position = UDim2.new(1, -70, 0.5, -13),
-    BackgroundColor3 = Color3.fromRGB(60, 120, 255),
-    Text = "",
-    Parent = top,
-    BorderSizePixel = 0
-})
-corner(fsBtn, 100)
-
---// MINIMIZE BUTTON
-local minBtn = create("TextButton", {
-    Size = UDim2.new(0, 26, 0, 26),
-    Position = UDim2.new(1, -35, 0.5, -13),
-    BackgroundColor3 = Color3.fromRGB(30,30,30),
-    Text = "",
-    Parent = top,
-    BorderSizePixel = 0
-})
-corner(minBtn, 100)
-
---// FULLSCREEN TOGGLE
-fsBtn.MouseButton1Click:Connect(function()
-    isFullscreen = not isFullscreen
-
-    if isFullscreen then
-        tween(main, {
-            Size = UDim2.new(1, 0, 1, 0),
-            Position = UDim2.new(0, 0, 0, 0)
-        }, 0.35)
-
-        tween(top, {BackgroundTransparency = 0}, 0.2)
-    else
-        tween(main, {
-            Size = normalSize,
-            Position = normalPos
-        }, 0.35)
-    end
-end)
-
---// MINIMIZE
-minBtn.MouseButton1Click:Connect(function()
-    if isMinimized then return end
-    isMinimized = true
-
-    tween(main, {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        BackgroundTransparency = 1
-    }, 0.25)
-
-    tween(top, {BackgroundTransparency = 1}, 0.25)
-
-    task.delay(0.25, function()
-        main.Visible = false
-        showBtn.Visible = true
-
-        showBtn.Size = UDim2.new(0, 0, 0, 40)
-        tween(showBtn, {Size = UDim2.new(0, 120, 0, 40)}, 0.25)
-    end)
-end)
-
---// SHOW BUTTON RESTORE
-showBtn.MouseButton1Click:Connect(function()
-    if not isMinimized then return end
-    isMinimized = false
-
-    main.Visible = true
-
-    tween(showBtn, {Size = UDim2.new(0, 0, 0, 40)}, 0.2)
-
-    task.delay(0.2, function()
-        showBtn.Visible = false
-
-        main.Size = UDim2.new(0, 0, 0, 0)
-        main.Position = UDim2.new(0.5, 0, 0.5, 0)
-        main.BackgroundTransparency = 1
-
-        tween(main, {
-            Size = normalSize,
-            Position = normalPos,
-            BackgroundTransparency = 0.05
-        }, 0.35)
-
-        tween(top, {BackgroundTransparency = 0.1}, 0.35)
-    end)
-end)
     local gui = create("ScreenGui", {
         Name = "Nova",
         Parent = Players.LocalPlayer:WaitForChild("PlayerGui"),
@@ -341,6 +230,124 @@ end)
     })
 
     drag(main, top)
+
+    -------------------------------------------------
+-- WINDOW CONTROLS
+-------------------------------------------------
+
+local TweenService = game:GetService("TweenService")
+
+local isFullscreen = false
+local isMinimized = false
+
+local normalSize = main.Size
+local normalPos = main.Position
+
+-- SHOW BUTTON (appears after minimize)
+local showBtn = create("TextButton", {
+    Size = UDim2.new(0, 0, 0, 40),
+    Position = UDim2.new(0.5, -60, 0.5, -20),
+    BackgroundColor3 = Color3.fromRGB(15, 15, 15),
+    Text = "Show",
+    TextColor3 = Color3.fromRGB(255,255,255),
+    Font = Enum.Font.GothamBold,
+    Visible = false,
+    Parent = gui,
+    BorderSizePixel = 0
+})
+
+corner(showBtn, 10)
+stroke(showBtn)
+
+-- FULLSCREEN BUTTON
+local fsBtn = create("TextButton", {
+    Size = UDim2.new(0, 26, 0, 26),
+    Position = UDim2.new(1, -70, 0.5, -13),
+    BackgroundColor3 = Color3.fromRGB(70, 140, 255),
+    Text = "",
+    Parent = top,
+    BorderSizePixel = 0
+})
+
+corner(fsBtn, 100)
+
+-- MINIMIZE BUTTON
+local minBtn = create("TextButton", {
+    Size = UDim2.new(0, 26, 0, 26),
+    Position = UDim2.new(1, -35, 0.5, -13),
+    BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+    Text = "",
+    Parent = top,
+    BorderSizePixel = 0
+})
+
+corner(minBtn, 100)
+
+-------------------------------------------------
+-- FULLSCREEN TOGGLE
+-------------------------------------------------
+
+fsBtn.MouseButton1Click:Connect(function()
+    isFullscreen = not isFullscreen
+
+    if isFullscreen then
+        TweenService:Create(main, TweenInfo.new(0.35), {
+            Size = UDim2.new(1, 0, 1, 0),
+            Position = UDim2.new(0, 0, 0, 0)
+        }):Play()
+    else
+        TweenService:Create(main, TweenInfo.new(0.35), {
+            Size = normalSize,
+            Position = normalPos
+        }):Play()
+    end
+end)
+
+-------------------------------------------------
+-- MINIMIZE
+-------------------------------------------------
+
+minBtn.MouseButton1Click:Connect(function()
+    if isMinimized then return end
+    isMinimized = true
+
+    TweenService:Create(main, TweenInfo.new(0.25), {
+        Size = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 1
+    }):Play()
+
+    task.delay(0.25, function()
+        main.Visible = false
+        showBtn.Visible = true
+
+        showBtn.Size = UDim2.new(0, 0, 0, 40)
+
+        TweenService:Create(showBtn, TweenInfo.new(0.25), {
+            Size = UDim2.new(0, 120, 0, 40)
+        }):Play()
+    end)
+end)
+
+-------------------------------------------------
+-- SHOW RESTORE
+-------------------------------------------------
+
+showBtn.MouseButton1Click:Connect(function()
+    if not isMinimized then return end
+    isMinimized = false
+
+    main.Visible = true
+    showBtn.Visible = false
+
+    main.Size = UDim2.new(0, 0, 0, 0)
+    main.BackgroundTransparency = 1
+
+    TweenService:Create(main, TweenInfo.new(0.35), {
+        Size = normalSize,
+        Position = normalPos,
+        BackgroundTransparency = 0.05
+    }):Play()
+end)
 
     return setmetatable({
         Gui = gui,

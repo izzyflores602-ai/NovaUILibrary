@@ -1,3 +1,4 @@
+--Made by feetsmeller on scriptblox
 local Nova = {}
 Nova.__index = Nova
 

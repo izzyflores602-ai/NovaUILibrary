@@ -1,0 +1,134 @@
+local Nova = {}
+Nova.__index = Nova
+
+Nova.State = {
+    Toggles = {}
+}
+
+function Nova:CreateWindow(config)
+    local screenGui = Instance.new("ScreenGui")
+    local main = Instance.new("Frame")
+    local sidebar = Instance.new("Frame")
+    local pages = Instance.new("Frame")
+    local tabList = Instance.new("UIListLayout")
+
+    screenGui.Name = config and config.Name or "NovaUI"
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+    main.Parent = screenGui
+    main.Size = UDim2.new(0, 520, 0, 360)
+    main.Position = UDim2.new(0.5, -260, 0.5, -180)
+    main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+
+    sidebar.Parent = main
+    sidebar.Size = UDim2.new(0, 130, 1, 0)
+    sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+
+    pages.Parent = main
+    pages.Size = UDim2.new(1, -130, 1, 0)
+    pages.Position = UDim2.new(0, 130, 0, 0)
+    pages.BackgroundTransparency = 1
+
+    tabList.Parent = sidebar
+    tabList.SortOrder = Enum.SortOrder.LayoutOrder
+
+    local self = setmetatable({}, Nova)
+    self.Gui = screenGui
+    self.Main = main
+    self.Sidebar = sidebar
+    self.Pages = pages
+    self.Tabs = {}
+
+    return self
+end
+
+function Nova:CreateTab(name)
+    local tabButton = Instance.new("TextButton")
+    local page = Instance.new("Frame")
+    local layout = Instance.new("UIListLayout")
+
+    tabButton.Parent = self.Sidebar
+    tabButton.Size = UDim2.new(1, 0, 0, 34)
+    tabButton.Text = name
+    tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    page.Parent = self.Pages
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.Visible = false
+    page.BackgroundTransparency = 1
+
+    layout.Parent = page
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    local tab = {
+        Button = tabButton,
+        Page = page
+    }
+
+    tabButton.MouseButton1Click:Connect(function()
+        for _, v in pairs(self.Tabs) do
+            v.Page.Visible = false
+        end
+        page.Visible = true
+    end)
+
+    table.insert(self.Tabs, tab)
+
+    return tab
+end
+
+function Nova:Button(tab, text, callback)
+    local button = Instance.new("TextButton")
+
+    button.Parent = tab.Page
+    button.Size = UDim2.new(1, -10, 0, 34)
+    button.Position = UDim2.new(0, 5, 0, 0)
+    button.Text = text
+    button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    button.MouseButton1Click:Connect(function()
+        if callback then
+            callback()
+        end
+    end)
+
+    return button
+end
+
+function Nova:Toggle(tab, text, default, callback)
+    local holder = Instance.new("Frame")
+    local button = Instance.new("TextButton")
+
+    holder.Parent = tab.Page
+    holder.Size = UDim2.new(1, -10, 0, 34)
+    holder.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+
+    button.Parent = holder
+    button.Size = UDim2.new(1, 0, 1, 0)
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.BackgroundTransparency = 1
+
+    local state = default or false
+    self.State.Toggles[text] = state
+
+    local function update()
+        self.State.Toggles[text] = state
+        if callback then
+            callback(state)
+        end
+    end
+
+    button.MouseButton1Click:Connect(function()
+        state = not state
+        update()
+    end)
+
+    update()
+
+    return holder
+end
+
+return Nova

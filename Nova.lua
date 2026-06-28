@@ -234,6 +234,9 @@ function Nova:CreateWindow(cfg)
     -------------------------------------------------
 -- WINDOW CONTROLS
 -------------------------------------------------
+-------------------------------------------------
+-- WINDOW CONTROLS (FIXED)
+-------------------------------------------------
 
 local TweenService = game:GetService("TweenService")
 
@@ -243,17 +246,18 @@ local isMinimized = false
 local normalSize = main.Size
 local normalPos = main.Position
 
--- SHOW BUTTON (appears after minimize)
+-- SHOW BUTTON (restores UI)
 local showBtn = create("TextButton", {
-    Size = UDim2.new(0, 0, 0, 40),
+    Size = UDim2.new(0, 120, 0, 40),
     Position = UDim2.new(0.5, -60, 0.5, -20),
-    BackgroundColor3 = Color3.fromRGB(15, 15, 15),
+    BackgroundColor3 = Color3.fromRGB(15,15,15),
     Text = "Show",
     TextColor3 = Color3.fromRGB(255,255,255),
     Font = Enum.Font.GothamBold,
     Visible = false,
     Parent = gui,
-    BorderSizePixel = 0
+    BorderSizePixel = 0,
+    ZIndex = 10
 })
 
 corner(showBtn, 10)
@@ -263,24 +267,22 @@ stroke(showBtn)
 local fsBtn = create("TextButton", {
     Size = UDim2.new(0, 26, 0, 26),
     Position = UDim2.new(1, -70, 0.5, -13),
-    BackgroundColor3 = Color3.fromRGB(70, 140, 255),
+    BackgroundColor3 = Color3.fromRGB(60,120,255),
     Text = "",
     Parent = top,
     BorderSizePixel = 0
 })
-
 corner(fsBtn, 100)
 
 -- MINIMIZE BUTTON
 local minBtn = create("TextButton", {
     Size = UDim2.new(0, 26, 0, 26),
     Position = UDim2.new(1, -35, 0.5, -13),
-    BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+    BackgroundColor3 = Color3.fromRGB(35,35,35),
     Text = "",
     Parent = top,
     BorderSizePixel = 0
 })
-
 corner(minBtn, 100)
 
 -------------------------------------------------
@@ -291,12 +293,12 @@ fsBtn.MouseButton1Click:Connect(function()
     isFullscreen = not isFullscreen
 
     if isFullscreen then
-        TweenService:Create(main, TweenInfo.new(0.35), {
-            Size = UDim2.new(1, 0, 1, 0),
-            Position = UDim2.new(0, 0, 0, 0)
+        TweenService:Create(main, TweenInfo.new(0.3), {
+            Size = UDim2.new(1,0,1,0),
+            Position = UDim2.new(0,0,0,0)
         }):Play()
     else
-        TweenService:Create(main, TweenInfo.new(0.35), {
+        TweenService:Create(main, TweenInfo.new(0.3), {
             Size = normalSize,
             Position = normalPos
         }):Play()
@@ -312,24 +314,23 @@ minBtn.MouseButton1Click:Connect(function()
     isMinimized = true
 
     TweenService:Create(main, TweenInfo.new(0.25), {
-        Size = UDim2.new(0, 0, 0, 0),
+        Size = UDim2.new(0,0,0,0),
         BackgroundTransparency = 1
     }):Play()
 
     task.delay(0.25, function()
         main.Visible = false
         showBtn.Visible = true
+        showBtn.Size = UDim2.new(0,0,0,40)
 
-        showBtn.Size = UDim2.new(0, 0, 0, 40)
-
-        TweenService:Create(showBtn, TweenInfo.new(0.25), {
-            Size = UDim2.new(0, 120, 0, 40)
+        TweenService:Create(showBtn, TweenInfo.new(0.2), {
+            Size = UDim2.new(0,120,0,40)
         }):Play()
     end)
 end)
 
 -------------------------------------------------
--- SHOW RESTORE
+-- RESTORE
 -------------------------------------------------
 
 showBtn.MouseButton1Click:Connect(function()
@@ -339,10 +340,10 @@ showBtn.MouseButton1Click:Connect(function()
     main.Visible = true
     showBtn.Visible = false
 
-    main.Size = UDim2.new(0, 0, 0, 0)
+    main.Size = UDim2.new(0,0,0,0)
     main.BackgroundTransparency = 1
 
-    TweenService:Create(main, TweenInfo.new(0.35), {
+    TweenService:Create(main, TweenInfo.new(0.3), {
         Size = normalSize,
         Position = normalPos,
         BackgroundTransparency = 0.05

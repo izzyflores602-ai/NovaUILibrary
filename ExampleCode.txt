@@ -1,0 +1,9 @@
+local Nova = loadstring(game:HttpGet("https://raw.githubusercontent.com/izzyflores602-ai/NovaUILibrary/main/Nova.lua"))()
+
+local Window = Nova:CreateWindow({Name = "Test"})
+
+local Tab = Window:CreateTab("Main")
+
+Tab:NewButton("Test", function()
+    print("working")
+end)
